@@ -13,3 +13,16 @@ const gameboard = (function CreateGameboard() {
     const getBoard = () => board;
     return {getBoard};
 })();
+
+function createPlayer(name) {
+    const playerName = name;
+
+    let score = 0;
+    const getScore = () => score;
+    const incrementScore = () => {score++; };
+
+    return {playerName, getScore, incrementScore};
+};
+
+const playerOne = createPlayer("Player 1");
+const playerTwo = createPlayer("Player 2");
