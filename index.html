@@ -8,11 +8,22 @@
     <title>Tic Tac Toe</title>
 </head>
 <body>
-    <h1 class = "turn"></h1>
     <div class = "container">
-        <div class = "board"></div>
-    </div>
-    <div class = "result"></div>
+        <div class = "information">
+            <div class = "result"></div>
+            <form action = "#" method = "post">
+                <label for = "player_one">Player One Name:</label>
+                <input type = "text" id = "player_one" placeholder="Player One">
+                <label for = "player_two">Player Two Name:</label>
+                <input type = "text" id = "player_two" placeholder="Player Two">
+                <button type = "submit" class = "start-game">Start Game</button>
+            </form>
+        </div>
+
+        <div class = "game-arena">
+            <h1 class = "turn"></h1> 
+            <div class = "board"></div>
+        </div>
     </div>
 </body>
 </html>

@@ -65,7 +65,16 @@ const gameboard = (function CreateGameboard() {
         }
         return true;
     }
-    return {getBoard, checkCell, checkWin, isFull};
+
+    const resetBoard = () => {
+        for (let o = 0; o < 3; o++) {
+            for (let p = 0; p < 3; p++) {
+                board[o][p] = initialiseCell();
+            }
+        }
+    }
+
+    return {getBoard, checkCell, checkWin, isFull, resetBoard};
 })();
 
 function createPlayer(name) {
@@ -77,9 +86,6 @@ function createPlayer(name) {
 
     return {playerName, getScore, incrementScore};
 };
-
-const playerOne = createPlayer("Player 1");
-const playerTwo = createPlayer("Player 2");
 
 function gameController(playerOne, playerTwo) {
     let gameOver = false;
@@ -122,48 +128,76 @@ function gameController(playerOne, playerTwo) {
 };
 
 function screenController () {
-      const game = gameController(playerOne,playerTwo);
-      const playerTurnH1 = document.querySelector('.turn');
-      const boardDiv = document.querySelector('.board');
-      const resultDiv = document.querySelector(".result");
+    let game = null;
+    const playerTurnH1 = document.querySelector('.turn');
+    const boardDiv = document.querySelector('.board');
+    const resultDiv = document.querySelector(".result");
+    const startButton = document.querySelector(".start-game");
+    const playerOneInput = document.getElementById("player_one");
+    const playerTwoInput = document.getElementById("player_two");
+    const form = document.querySelector("form");
+    let finished = false;
 
-      const updateScreen = () => {
+    const updateScreen = (finished) => {
         boardDiv.textContent = "";
+        if (!game) {return};
         const board = game.getBoard();
         const activePlayer = game.getCurrentPlayer();
-        playerTurnH1.textContent = `${activePlayer.playerName}'s turn...`;
-        
-        board.forEach((row, rowIndex) => {
-            row.forEach((cell, colIndex) => {
-                const cellButton = document.createElement("button");
-                cellButton.classList.add("cell");
-                cellButton.dataset.row = rowIndex;
-                cellButton.dataset.column = colIndex;
-                cellButton.textContent = cell.getValue();
-                boardDiv.appendChild(cellButton);
-            })
-        })
-      }
-
-      function clickHandler(event) {
-        let selectedCell = event.target;
-        if (!selectedCell.classList.contains("cell")) {return};
-        const chosenRow = selectedCell.dataset.row;
-        const chosenColumn = selectedCell.dataset.column;
-        const message = game.playRound(chosenRow, chosenColumn);
-
-        if (message == "draw") {
-            resultDiv.textContent = "It's a draw because the board has been filled!";
-        } else if (message == "win") {
-            const winner = game.getCurrentPlayer();
-            resultDiv.textContent = `${winner.playerName} has won this round!`;
+        if (!finished) {
+            form.classList.remove("add-margin");
+            playerTurnH1.textContent = `${activePlayer.playerName}'s turn...`;
         }
+    
+    board.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+            const cellButton = document.createElement("button");
+            cellButton.classList.add("cell");
+            cellButton.dataset.row = rowIndex;
+            cellButton.dataset.column = colIndex;
+            cellButton.textContent = cell.getValue();
+            boardDiv.appendChild(cellButton);
+        })
+    })
+    }
 
-        updateScreen();
-     };
+    function clickHandler(event) {
+    let selectedCell = event.target;
+    if (!selectedCell.classList.contains("cell")) {return};
+    const chosenRow = selectedCell.dataset.row;
+    const chosenColumn = selectedCell.dataset.column;
+    const message = game.playRound(chosenRow, chosenColumn);
 
-     boardDiv.addEventListener("click", clickHandler);
-     updateScreen();
+    if (message == "draw") {
+        form.classList.add("add-margin");
+        resultDiv.textContent = "It's a draw because the board has been filled!";
+        playerTurnH1.textContent = `It's a draw!`;
+        finished = true;
+    } else if (message == "win") {
+        const winner = game.getCurrentPlayer();
+        form.classList.add("add-margin");
+        resultDiv.textContent = `${winner.playerName} has won this round!`;
+        playerTurnH1.textContent = `${winner.playerName} wins!`;
+        finished = true;
+    }
+
+    updateScreen(finished);
+    };
+
+    boardDiv.addEventListener("click", clickHandler);
+    startButton.addEventListener("click", event => {
+        event.preventDefault();
+        finished = true;
+        resultDiv.textContent = "";
+        gameboard.resetBoard();
+        updateScreen(finished);
+        const playerOne = createPlayer(playerOneInput.value || "Player One");
+        const playerTwo = createPlayer(playerTwoInput.value || "Player Two");
+        game = gameController(playerOne,playerTwo);
+        finished = false;
+        updateScreen(finished);
+
+    })
+    updateScreen(finished);
 };
 
 screenController();
