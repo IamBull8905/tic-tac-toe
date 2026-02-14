@@ -1,1 +1,2 @@
 # tic-tac-toe
+This is the second project in the Javascript course for The Odin Project. It was the most difficult project so far but taught me how to use: factory functions, modules, IIFEs and more. Also, it allowed me to recap HTML forms and CSS layouts.
