@@ -1,3 +1,5 @@
+// after one person gets a 3 in a row, any click that same player does (regardless if it is 3 in a row or not receives a point)
+
 const gameboard = (function CreateGameboard() {
     const rows = 3;
     const columns = 3;
@@ -89,6 +91,7 @@ const playerOne = createPlayer("Player 1");
 const playerTwo = createPlayer("Player 2");
 
 function gameController(playerOne, playerTwo) {
+    let gameOver = false;
     playerOne.mark = "O";
     playerTwo.mark = "X";
     const activePlayers = [playerOne, playerTwo];
@@ -104,6 +107,9 @@ function gameController(playerOne, playerTwo) {
     const getCurrentPlayer = () => currentPlayer;
 
     function playRound(chosenRow,chosenColumn) {
+        if (gameOver === true) {
+            return null;
+        }
         if (gameboard.checkCell(chosenRow,chosenColumn,currentPlayer.mark) === false) {
             console.log("Try again!");
             return false;
@@ -113,37 +119,80 @@ function gameController(playerOne, playerTwo) {
         if (result === true) {
             currentPlayer.incrementScore()
             console.log(currentPlayer.playerName, "received a point!");
+            gameOver = true;
+            return "win";
         }
         
         if (gameboard.isFull() === true) {
             gameboard.printBoard();
             if (activePlayers[0].getScore() === activePlayers[1].getScore()) {
-                console.log("It's a draw!");
-            } else if (activePlayers[0].getScore() > activePlayers[1].getScore()) {
-                console.log(activePlayers[0].playerName, "wins!");
-            } else {
-                console.log(activePlayers[1].playerName, "wins!");
+                return "draw";
+            }else {
+                return "win";
             };
-
-            return "Finished";
         };
         switchPlayerTurn();
         gameboard.printBoard();
-        return true;
+        return null;
     };
-    return {playRound};
+    return {playRound, getCurrentPlayer, getBoard: gameboard.getBoard, getPlayers: () => activePlayers};
 };
 
-const game = gameController(playerOne, playerTwo);
+function screenController () {
+      const game = gameController(playerOne,playerTwo);
+      const playerTurnH1 = document.querySelector('.turn');
+      const boardDiv = document.querySelector('.board');
+      const resultDiv = document.querySelector(".result");
+
+      const updateScreen = () => {
+        boardDiv.textContent = "";
+        const board = game.getBoard();
+        const activePlayer = game.getCurrentPlayer();
+        playerTurnH1.textContent = `${activePlayer.playerName}'s turn...`;
+        
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, colIndex) => {
+                const cellButton = document.createElement("button");
+                cellButton.classList.add("cell");
+                cellButton.dataset.row = rowIndex;
+                cellButton.dataset.column = colIndex;
+                cellButton.textContent = cell.getValue();
+                boardDiv.appendChild(cellButton);
+            })
+        })
+      }
+
+      function clickHandler(event) {
+        let selectedCell = event.target;
+        if (!selectedCell.classList.contains("cell")) {return};
+        const chosenRow = selectedCell.dataset.row;
+        const chosenColumn = selectedCell.dataset.column;
+        const message = game.playRound(chosenRow, chosenColumn);
+
+        if (message == "draw") {
+            resultDiv.textContent = "It's a draw because the board has been filled!";
+        } else if (message == "win") {
+            const winner = game.getCurrentPlayer();
+            resultDiv.textContent = `${winner.playerName} has won this round!`;
+        }
+
+        updateScreen();
+     };
+
+     boardDiv.addEventListener("click", clickHandler);
+     updateScreen();
+};
+
+screenController();
 
 // test cases to ensure functionality
-game.playRound(0,0);
-game.playRound(0,1);
-game.playRound(0,2);
-game.playRound(1,0);
-game.playRound(1,1);
-game.playRound(1,2);
-game.playRound(2,0);
-game.playRound(2,0);
-game.playRound(2,2);
-game.playRound(2,1);
+// game.playRound(0,0);
+// game.playRound(0,1);
+// game.playRound(0,2);
+// game.playRound(1,0);
+// game.playRound(1,1);
+// game.playRound(1,2);
+// game.playRound(2,0);
+// game.playRound(2,0);
+// game.playRound(2,2);
+// game.playRound(2,1);

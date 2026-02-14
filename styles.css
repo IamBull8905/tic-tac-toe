@@ -1,0 +1,42 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #232528;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    color: #dcdcdc;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3,250px);
+    grid-template-rows: repeat(3,250px);
+}
+
+.cell {
+    font-size: 7rem;
+    color: #EAF6FF;
+    background-color: #2A2A72;
+}
+
+.result {
+    font-size: 1.5rem;
+    color: #dcdcdc;
+}
