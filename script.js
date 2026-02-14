@@ -1,5 +1,3 @@
-// after one person gets a 3 in a row, any click that same player does (regardless if it is 3 in a row or not receives a point)
-
 const gameboard = (function CreateGameboard() {
     const rows = 3;
     const columns = 3;
@@ -19,13 +17,6 @@ const gameboard = (function CreateGameboard() {
         for (let j = 0; j < columns; j++) {
             board[i][j] = initialiseCell();
         };
-    };
-    const printBoard = () => { // remove when integration with DOM
-        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getValue()));
-        for (const row of boardWithCellValues) {
-            console.log(row);
-        };
-        console.log("-----------------------------------------");
     };
 
     const getBoard = () => board;
@@ -74,7 +65,7 @@ const gameboard = (function CreateGameboard() {
         }
         return true;
     }
-    return {getBoard, checkCell, checkWin, isFull, printBoard};
+    return {getBoard, checkCell, checkWin, isFull};
 })();
 
 function createPlayer(name) {
@@ -111,28 +102,20 @@ function gameController(playerOne, playerTwo) {
             return null;
         }
         if (gameboard.checkCell(chosenRow,chosenColumn,currentPlayer.mark) === false) {
-            console.log("Try again!");
             return false;
         };
 
         let result = gameboard.checkWin(currentPlayer.mark);
         if (result === true) {
             currentPlayer.incrementScore()
-            console.log(currentPlayer.playerName, "received a point!");
             gameOver = true;
             return "win";
         }
         
         if (gameboard.isFull() === true) {
-            gameboard.printBoard();
-            if (activePlayers[0].getScore() === activePlayers[1].getScore()) {
-                return "draw";
-            }else {
-                return "win";
-            };
+            return "draw";
         };
         switchPlayerTurn();
-        gameboard.printBoard();
         return null;
     };
     return {playRound, getCurrentPlayer, getBoard: gameboard.getBoard, getPlayers: () => activePlayers};
@@ -184,15 +167,3 @@ function screenController () {
 };
 
 screenController();
-
-// test cases to ensure functionality
-// game.playRound(0,0);
-// game.playRound(0,1);
-// game.playRound(0,2);
-// game.playRound(1,0);
-// game.playRound(1,1);
-// game.playRound(1,2);
-// game.playRound(2,0);
-// game.playRound(2,0);
-// game.playRound(2,2);
-// game.playRound(2,1);
